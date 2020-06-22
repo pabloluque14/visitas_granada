@@ -1,0 +1,88 @@
+{% extends 'visitas_granada/base.html' %}
+
+{% block content %}
+
+    <h5>{{visita.nombre}}</h5>
+    <img src="{{ MEDIA_URL }}{{visita.foto}}">
+    <p>{{visita.descripción}}</p>
+    <div>
+        <b>Likes:</b> <label id="likescounter"></label> 
+        <button id='like' type="button" class="btn btn-light"><i data-feather="thumbs-up"></i></button>
+        <button id='dislike' type="button" class="btn btn-light"><i data-feather="thumbs-down"></i></button>
+    </div>
+    <hr>
+    <h1>Ubicación</h1>
+    <div id="mapid"></div>
+    <hr>
+    <br>
+    {% if user.is_authenticated %}
+    <a href="{% url 'update_visita' visita.pk %}"><button type="button" class="boton_personalizado">Editar Visita</button></a>
+    <a href="{% url 'delete_visita' visita.pk %}"><button type="button" class="boton_personalizado">Borrar Visita</button></a>
+    {%endif%}
+    <hr>
+
+{% endblock %}
+
+{% block like_manager %}
+
+<script text="text/javascript">
+    // Obtener los likes actuales:
+    var likes = "{{ visita.likes }}";
+    likes = Number(likes);
+    var likeout = document.getElementById('likescounter');
+    likeout.innerHTML = likes;
+
+    // Para actualizar en la base de datos el valor de los likes:
+    function SendValue(value) {
+        $.ajax({
+            'url': "{% url 'likes' visita.pk %}",
+            'type': 'PUT',
+            'dataType': 'json',
+            'data': JSON.stringify({'likes': value}),
+            'success': function (data)  {
+                likes = Number(data.likes);
+            }
+        })
+    }
+
+    // JQuery:
+    $(document).ready(function() {
+        // Like:
+        $("#like").click(function() {
+            likes += 1;
+            likeout.innerHTML = likes;
+            SendValue(likes)
+        });
+
+        // Dislike
+        $("#dislike").click(function() {
+            likes -= 1;
+            if(likes < 0) { likes = 0; }
+            likeout.innerHTML = likes;
+            SendValue(likes)
+        });
+    });
+</script>
+
+{% endblock %}
+
+
+{% block map %}
+
+<script text="text/javascript">
+    var lat = "{{lat}}";
+    var lon = "{{lon}}";
+
+    var map = L.map('mapid').setView([lat, lon], 16);
+
+    L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://cloudmade.com">CloudMade</a>',
+        maxZoom: 18
+    }).addTo(map);
+
+    L.control.scale().addTo(map);
+    L.marker([lat, lon]).addTo(map);
+</script>
+
+
+{% endblock %}

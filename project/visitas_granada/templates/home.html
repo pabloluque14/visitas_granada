@@ -1,0 +1,14 @@
+{% extends 'visitas_granada/base.html' %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+  {% if user.is_authenticated %}
+    <h1> Hola {{ user.username }}!</h1> 
+    <p><a href="{% url 'logout' %}">logout</a></p>
+  {% else %}
+    <h5>You are not logged in</h5>
+    <a href="{% url 'login' %}">login</a>
+  {% endif %}
+
+{% endblock %}

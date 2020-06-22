@@ -1,0 +1,26 @@
+{% extends 'visitas_granada/base.html' %}
+
+{% block content %}
+
+  {% if lista_visitas %}
+      <ul>
+      {% for visita in lista_visitas %}
+          <h5>{{visita.nombre}}</h5>
+          <img src="{{ MEDIA_URL }}{{visita.foto}}">
+          <br>
+          <br>
+          <a href="{% url 'detail' visita.pk %}"><button type="button" class="boton_personalizado">Ver Visita</button></a>
+          <br>
+          <br>
+          
+             
+        {% endfor %}
+      </ul>
+  {% else %}
+      <p>No hay visitas disponibles ahora.</p>
+  {% endif %}
+
+
+
+
+{% endblock %}
